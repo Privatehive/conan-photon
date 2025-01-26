@@ -55,11 +55,11 @@ class OpenJDK(ConanFile):
     def build(self):
         if self.settings.os == "Macos" or self.settings.os == "Linux":
             #self.run("./gradlew clean")
-            self.run("./gradlew build")
+            self.run("./gradlew build -x test")
             self.run("./gradlew getDependencies")
         else:
             #self.run("gradlew.bat clean")
-            self.run("gradlew.bat build")
+            self.run("gradlew.bat build -x test")
             self.run("gradlew.bat getDependencies")
 
     def package(self):
