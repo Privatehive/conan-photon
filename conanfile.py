@@ -26,7 +26,7 @@ class OpenJDK(ConanFile):
     url = jsonInfo["repository"]
     # ---Requirements---
     requires = []
-    tool_requires = ["openjdk/[>=11.0.0]@%s/stable" % user]
+    tool_requires = ["openjdk/[~19]@%s/stable" % user]
     # ---Sources---
     exports = ["info.json"]
     exports_sources = []
@@ -50,6 +50,7 @@ class OpenJDK(ConanFile):
         git.clone(url="https://github.com/fschleich/photon.git", target="./")
         #git.checkout("v%s" % self.version)
         git.checkout("CompositionRefactoring")
+        replace_in_file(self, os.path.join(self.source_folder, "build.gradle"), "JavaLanguageVersion.of(11)", "JavaLanguageVersion.of(19)")
 
     def build(self):
         if self.settings.os == "Macos" or self.settings.os == "Linux":
