@@ -14,7 +14,6 @@ jobs:
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
       image: "windows-2022"
-      conan_host_profile: "windowsMinGW"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_macos_armv8:
