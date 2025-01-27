@@ -9,7 +9,7 @@ import json, os
 
 required_conan_version = ">=2.0"
 
-class OpenJDK(ConanFile):
+class Photon(ConanFile):
 
     jsonInfo = json.load(open("info.json", 'r'))
     # ---Package reference---
@@ -63,4 +63,10 @@ class OpenJDK(ConanFile):
             self.run("gradlew.bat getDependencies")
 
     def package(self):
+        self.cpp_info.includedirs = []
+        self.cpp_info.libdirs = []
+        self.cpp_info.bindirs = []
+        self.cpp_info.builddirs = ['./']
         copy(self, pattern="*.jar", src=os.path.join(self.build_folder, "build", "libs"), dst=os.path.join(self.package_folder, "bin"))
+        with open(os.path.join(self.package_folder, "Findphoton.cmake"), "w") as f:
+            f.write('file(GLOB photon_jar_files "${CMAKE_CURRENT_LIST_DIR}/bin/*.jar")\nset(photon_files ${photon_jar_files} PARENT_SCOPE)')
