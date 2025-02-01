@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from conan import ConanFile
-from conan.tools.files import copy, get, replace_in_file
+from conan.tools.files import copy, replace_in_file
 from conan.tools.scm import Git
+from conan.tools.env import Environment
 from conan.errors import ConanInvalidConfiguration
 import json, os, io
 
@@ -62,17 +63,21 @@ class Photon(ConanFile):
         with open(os.path.join(self.build_folder, "gradle.properties"), "w") as f:
             f.write('version=%s' % self.version)
 
-        stdout = io.StringIO()
-        if self.settings.os == "Macos" or self.settings.os == "Linux":
-            self.run("./gradlew build -x test")
-            self.run("./gradlew getDependencies")
-            self.run("jdeps --multi-release 19 --module-path \"$JAVA_HOME/lib/jmods\" -cp 'build/libs/*' --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
-            self.run("jlink --compress 2 --strip-debug --no-header-files --no-man-pages --module-path \"$JAVA_HOME/lib/jmods\" --output jre --add-modules java.desktop,%s" % stdout.getvalue())
-        else:
-            self.run("gradlew.bat build -x test")
-            self.run("gradlew.bat getDependencies")
-            self.run("jdeps --multi-release 19 --module-path \"%JAVA_HOME%/lib/jmods\" -cp build/libs/* --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
-            self.run("jlink --compress 2 --strip-debug --no-header-files --no-man-pages --module-path \"%JAVA_HOME%/lib/jmods\" --output jre --add-modules java.desktop,%s" % stdout.getvalue())
+        env = Environment()
+        env.define("GRADLE_USER_HOME", os.path.join(self.build_folder, "gradle_home"))
+        envvars = env.vars(self)
+        with envvars.apply():
+            stdout = io.StringIO()
+            if self.settings.os == "Macos" or self.settings.os == "Linux":
+                self.run("./gradlew build -x test")
+                self.run("./gradlew getDependencies")
+                self.run("jdeps --multi-release 19 --module-path \"$JAVA_HOME/jmods\" -cp 'build/libs/*' --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
+                self.run("jlink --compress 2 --strip-debug --no-header-files --no-man-pages --module-path \"$JAVA_HOME/jmods\" --output jre --add-modules java.desktop,%s" % stdout.getvalue())
+            else:
+                self.run("gradlew.bat build -x test")
+                self.run("gradlew.bat getDependencies")
+                self.run("jdeps --multi-release 19 --module-path \"%%JAVA_HOME%%/jmods\" -cp build/libs/* --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
+                self.run("jlink --compress 2 --strip-debug --no-header-files --no-man-pages --module-path \"%%JAVA_HOME%%/jmods\" --output jre --add-modules java.desktop,%s" % stdout.getvalue())
 
     def package(self):
         copy(self, pattern="*.jar", src=os.path.join(self.build_folder, "build", "libs"), dst=os.path.join(self.package_folder, "photon"))
