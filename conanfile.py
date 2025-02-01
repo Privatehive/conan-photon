@@ -65,6 +65,7 @@ class Photon(ConanFile):
 
         env = Environment()
         env.define("GRADLE_USER_HOME", os.path.join(self.build_folder, "gradle_home"))
+        env.define("GRADLE_OPTS", "-Dorg.gradle.daemon=false")
         envvars = env.vars(self)
         with envvars.apply():
             stdout = io.StringIO()
