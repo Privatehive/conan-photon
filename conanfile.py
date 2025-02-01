@@ -16,7 +16,7 @@ class Photon(ConanFile):
     name = jsonInfo["projectName"]
     version = jsonInfo["version"]
     user = jsonInfo["domain"]
-    channel = "stable"
+    channel = "snapshot"
     # ---Metadata---
     description = jsonInfo["projectDescription"]
     license = jsonInfo["license"]
@@ -50,7 +50,12 @@ class Photon(ConanFile):
         git.clone(url="https://github.com/fschleich/photon.git", target="./")
         #git.checkout("v%s" % self.version)
         git.checkout("CompositionRefactoring")
+        version = self.version
+        if self.channel == "snapshot":
+            version += "-snapshot"
         replace_in_file(self, os.path.join(self.source_folder, "build.gradle"), "JavaLanguageVersion.of(11)", "JavaLanguageVersion.of(19)")
+        replace_in_file(self, os.path.join(self.source_folder, "src", "main", "java", "com", "netflix", "imflibrary", "utils", "Utilities.java"), "\"0.0.0\"", "\"%s\"" % version)
+        replace_in_file(self, os.path.join(self.source_folder, "src", "main", "java", "com", "netflix", "imflibrary", "utils", "Utilities.java"), "return theClass.getPackage().getImplementationVersion();", "return \"%s\";" % version)
 
     def build(self):
 
