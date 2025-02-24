@@ -3,7 +3,7 @@
 
 from conan import ConanFile
 from conan.tools.files import copy, replace_in_file
-from conan.tools.scm import Git
+from conan.tools.files import get
 from conan.tools.env import Environment
 from conan.errors import ConanInvalidConfiguration
 import json, os, io
@@ -46,11 +46,7 @@ class Photon(ConanFile):
             raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following operating systems: {valid_os}")
 
     def source(self):
-        git = Git(self)
-        #git.clone(url="https://github.com/Netflix/photon.git", target="./")
-        git.clone(url="https://github.com/fschleich/photon.git", target="./")
-        #git.checkout("v%s" % self.version)
-        git.checkout("CompositionRefactoring")
+        get(self, "https://github.com/fschleich/photon/archive/aef41c3afe78ffe425afe2b56444ef664df294a4.zip", strip_root=True)
         version = self.version
         if self.channel == "snapshot":
             version += "-snapshot"
@@ -70,6 +66,7 @@ class Photon(ConanFile):
         with envvars.apply():
             stdout = io.StringIO()
             if self.settings.os == "Macos" or self.settings.os == "Linux":
+                self.run("chmod +x gradlew")
                 self.run("./gradlew build -x test")
                 self.run("./gradlew getDependencies")
                 self.run("jdeps --multi-release 19 --module-path \"$JAVA_HOME/jmods\" -cp 'build/libs/*' --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
