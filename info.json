@@ -1,5 +1,5 @@
 {
-    "version": "5.0.0",
+    "version": "4.10.8",
     "projectName": "photon",
     "projectDescription": "Photon is a Java implementation of the Interoperable Master Format (IMF) standard",
     "vendor": "Björn Stresing",
