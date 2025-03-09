@@ -84,7 +84,7 @@ class PhotonConan(ConanFile):
         if self.settings.os == "Macos" or self.settings.os == "Linux":
             self.run("cp -r \"$JAVA_HOME/jre\" \"%s\"" % self.build_folder)
         else:
-            self.run("xcopy \"%%JAVA_HOME%%\\jre\" \"%s\" /E /H /C /I" % self.build_folder)
+            self.run("cmd /V:ON /C \"xcopy \"!JAVA_HOME!\\jre\" \"%s\\jre\" /E /H /C /I /Q\"" % self.build_folder)
 
     def package(self):
         copy(self, pattern="*.jar", src=os.path.join(self.build_folder, "photon", "build", "libs"), dst=os.path.join(self.package_folder, "photon"))
