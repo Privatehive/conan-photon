@@ -4,7 +4,7 @@
     "projectDescription": "Photon is a Java implementation of the Interoperable Master Format (IMF) standard",
     "vendor": "Björn Stresing",
     "contact": "bjoern.stresing@gmx.de",
-    "domain": "de.privatehive",
+    "domain": "imftool",
     "copyrightYear": "2024",
     "repository": "https://github.com/Privatehive/conan-photon",
     "topics": ["IMF"],
