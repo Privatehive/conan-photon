@@ -7,30 +7,25 @@ from conan.tools.files import get
 from conan.tools.env import Environment
 from conan.tools.env import Environment
 from conan.errors import ConanInvalidConfiguration
-import json, os, io
+import os, io
 
 required_conan_version = ">=2.0"
 
-class Photon(ConanFile):
+class PhotonConan(ConanFile):
 
-    jsonInfo = json.load(open("info.json", 'r'))
     # ---Package reference---
-    name = jsonInfo["projectName"]
-    version = jsonInfo["version"]
-    user = jsonInfo["domain"]
+    name = "photon"
+    version = "4.10.8"
+    user = "imftool"
     channel = "stable"
     # ---Metadata---
-    description = jsonInfo["projectDescription"]
-    license = jsonInfo["license"]
-    author = jsonInfo["vendor"]
-    topics = jsonInfo["topics"]
-    homepage = jsonInfo["homepage"]
-    url = jsonInfo["repository"]
+    description = "Photon is a Java implementation of the Interoperable Master Format (IMF) standard"
+    license = "Apache License 2.0"
     # ---Requirements---
     requires = []
-    tool_requires = ["openjdk/[~8]@%s/stable" % user]
+    tool_requires = ["openjdk/[~8]@de.privatehive/stable"]
     # ---Sources---
-    exports = ["info.json"]
+    exports = []
     exports_sources = []
     # ---Binary model---
     settings = "os", "arch"
@@ -61,9 +56,7 @@ class Photon(ConanFile):
         replace_in_file(self, os.path.join(self.source_folder, "photon-adm", "src", "main", "java", "com", "netflix", "imflibrary", "utils", "Utilities.java"), "\"0.0.0\"", "\"%s-adm\"" % self.version)
         replace_in_file(self, os.path.join(self.source_folder, "photon-adm", "src", "main", "java", "com", "netflix", "imflibrary", "utils", "Utilities.java"), "return theClass.getPackage().getImplementationVersion();", "return \"%s\";" % self.version)
 
-
     def build_photon(self, buildFolder: str):
-        
         with open(os.path.join(buildFolder, "gradle.properties"), "w") as f:
             f.write('version=%s' % self.version)
 
@@ -84,7 +77,6 @@ class Photon(ConanFile):
                 self.run("gradlew.bat getDependencies", cwd=buildFolder)
                 #self.run("jdeps --multi-release 19 --module-path \"%%JAVA_HOME%%/jmods\" -cp build/libs/* --print-module-deps build/libs/Photon-%s.jar" % self.version, stdout=stdout)
                 #self.run("jlink --compress 2 --strip-debug --no-header-files --no-man-pages --module-path \"%%JAVA_HOME%%/jmods\" --output jre --add-modules java.desktop,%s" % stdout.getvalue())
-
 
     def build(self):
         self.build_photon(os.path.join(self.build_folder, "photon"))
